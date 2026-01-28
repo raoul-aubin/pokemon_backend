@@ -105,7 +105,9 @@ Antwort:
 Pokémon mit generierter ID
 ```
 
-### 🧪 Tests
+---
+
+## 🧪 Tests
 
 - REST-Tests mit Postman
 
@@ -113,7 +115,9 @@ Pokémon mit generierter ID
 
 - DELETE-Anfragen ohne Request Body
 
-### 🔐 Sicherheit (Hinweis)
+--- 
+
+## 🔐 Sicherheit (Hinweis)
 
 ⚠️ Aktuell gibt es noch keine Authentifizierung.
 Passwörter werden noch nicht gespeichert.
@@ -126,7 +130,7 @@ Geplante Umsetzung:
 
 - JWT-basierte Authentifizierung
 
-- ---
+---
 
 ## Autor
 - Entwickelt von [Raoul Tchangou]
