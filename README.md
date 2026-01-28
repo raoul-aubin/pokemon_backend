@@ -115,7 +115,7 @@ Pokémon mit generierter ID
 
 - DELETE-Anfragen ohne Request Body
 
---- 
+---
 
 ## 🔐 Sicherheit (Hinweis)
 
