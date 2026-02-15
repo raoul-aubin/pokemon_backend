@@ -1,138 +1,178 @@
 # 🐱‍👤 Pokémon Backend API
 
-Dieses Projekt ist ein **RESTful Backend** zur Verwaltung von Pokémon-Daten.  
-Es wurde mit **Jakarta EE**, **Payara Server**, **JPA (Jakarta Persistence)** und **MySQL** entwickelt.
+Dieses Projekt ist ein sicheres RESTful Backend zur Verwaltung von Pokémon und Benutzern.
+Es wurde mit Jakarta EE, Payara Server, JPA (EclipseLink) und MySQL entwickelt.
 
-Der Backend-Service stellt CRUD-Endpunkte (Create, Read, Update, Delete) für Pokémon bereit und ist so konzipiert, dass er später um **Benutzerverwaltung und Authentifizierung** erweitert werden kann.
-
----
+Die API implementiert eine JWT-basierte Authentifizierung, eine Benutzerverwaltung sowie eine Zugriffskontrolle, die sicherstellt, dass nur der Besitzer eines Pokémon dieses ändern oder löschen darf.
 
 ## 🚀 Technologien
 
-- **Java 17**
-- **Jakarta EE**
-    - JAX-RS (REST)
-    - CDI
-    - JPA
-- **Payara Server**
-- **MySQL**
-- **Maven**
-- **Postman** (für API-Tests)
-- **DBeaver** (für Datenbankverwaltung)
+- Java 17
 
----
+- Jakarta EE 10
 
-## 📦 Features (aktueller Stand)
+- JAX-RS (REST)
 
-### Pokémon
-- Alle Pokémon abrufen
-- Ein einzelnes Pokémon abrufen
-- Neues Pokémon anlegen
-- Pokémon aktualisieren
-- Pokémon löschen
-- Automatisch generierte IDs (MySQL `AUTO_INCREMENT`)
+- CDI
 
-### Geplant
-- Benutzer (`User`) Entity
-- Beziehung **User ↔ Pokémon (1:n)**
-- Authentifizierung (Login)
-- Passwort-Hashing
-- Benutzerprofil (Name ändern, Passwort ändern, Profil löschen)
-- Anzeige der Pokémon eines bestimmten Benutzers
+- JPA (EclipseLink)
 
----
+- Payara Server 6
 
-## 🗂️ Projektstruktur (vereinfacht)
-src/main/java
+- MySQL
 
-└── com.pokemon.pokemon_backend  
-├── model # JPA Entities (Pokemon, später User)  
-├── service # Business-Logik (JPA, Transactions)  
-└── resource # REST Resources (JAX-RS)
+- Maven
 
----
+- JWT (JJWT)
+
+- BCrypt
+
+- Postman (API-Tests)
+
+- DBeaver (Datenbankverwaltung)
+
+## 📦 Aktuelle Funktionen
+### 🔐 Authentifizierung & Sicherheit
+
+- Benutzerregistrierung (register)
+
+- Benutzeranmeldung (login)
+
+- JWT-Authentifizierung (Bearer Token)
+
+- Passwort-Hashing mit BCrypt
+
+- Globaler Authentifizierungsfilter (AuthFilter)
+
+- Öffentliche und geschützte Endpunkte
+
+- Zugriff auf den angemeldeten Benutzer über SecurityContext
+
+### 👤 Benutzer
+
+- Eigenes Profil anzeigen (/me)
+
+- Benutzername und E-Mail ändern
+
+- Passwort ändern
+
+- Benutzerkonto löschen
+
+- Eigene Pokémon anzeigen
+
+- Automatisches Löschen aller Pokémon beim Löschen des Kontos
+
+### 🐾 Pokémon
+
+- Alle Pokémon anzeigen (öffentlich)
+
+- Pokémon nach ID anzeigen (öffentlich)
+
+- Pokémon erstellen (authentifiziert)
+
+- Pokémon bearbeiten (nur Besitzer)
+
+- Pokémon löschen (nur Besitzer)
+
+- Beziehung User ↔ Pokémon (1:n)
+
+## 🗂️ Projektstruktur
+src/main/java  
+└── com.pokemon.pokemon_backend    
+├── model      # JPA-Entities (User, Pokemon)  
+├── dto        # DTOs (Auth, Register, Login, UserPublic)  
+├── service    # Business-Logik & Transaktionen
+├── resource   # REST-Endpunkte
+└── security   # JWT-Service & Auth-Filter
 
 ## 🗄️ Datenbank
 
-- **MySQL**
-- Verbindung über **JNDI Datasource** in Payara
-- Tabellen werden automatisch durch JPA erzeugt
+- MySQL
 
-### Verwendete Tabelle
-- `pokemon`
+- Verbindung über JNDI Datasource in Payara
 
----
+- Automatische Schema-Generierung durch JPA
+
+## Wichtige Tabellen
+
+- users
+
+- pokemon (mit Fremdschlüssel owner_id)
 
 ## ⚙️ Konfiguration
+### persistence.xml
 
-### `persistence.xml`
-Pfad:
-src/main/resources/META-INF/persistence.xml
+- Pfad: src/main/resources/META-INF/persistence.xml
 
-Verwendet:
+
+### Verwendet:
+
 - JTA
-- JNDI Datasource (`jdbc/pokemonDS`)
+
+- JNDI Datasource: jdbc/pokemonDS
+
 - Automatische Schema-Erstellung
 
----
-
 ## 🔌 REST-Endpunkte
+### 🔓 Öffentliche Endpunkte
+| Methode | Endpoint         | Beschreibung             |
+| ------- | ---------------- | ------------------------ |
+| POST    | `/auth/register` | Benutzer registrieren    |
+| POST    | `/auth/login`    | Benutzer anmelden        |
+| GET     | `/pokemons`      | Alle Pokémon anzeigen    |
+| GET     | `/pokemons/{id}` | Pokémon nach ID anzeigen |
 
-### Pokémon
+### 🔐 Geschützte Endpunkte (JWT erforderlich)
+#### Benutzer (/me)
+| Methode | Endpoint       | Beschreibung                   |
+| ------- | -------------- | ------------------------------ |
+| GET     | `/me`          | Eigenes Profil anzeigen        |
+| PUT     | `/me`          | Benutzername und E-Mail ändern |
+| PUT     | `/me/password` | Passwort ändern                |
+| DELETE  | `/me`          | Benutzerkonto löschen          |
+| GET     | `/me/pokemons` | Eigene Pokémon anzeigen        |
 
-| Methode | Endpoint | Beschreibung |
-|------|--------|-------------|
-| GET | `/pokemons` | Alle Pokémon abrufen |
-| GET | `/pokemons/{id}` | Pokémon nach ID |
-| POST | `/pokemons` | Neues Pokémon erstellen |
-| PUT | `/pokemons/{id}` | Pokémon aktualisieren |
-| DELETE | `/pokemons/{id}` | Pokémon löschen |
+#### Pokémon
+| Methode | Endpoint         | Beschreibung                      |
+| ------- | ---------------- | --------------------------------- |
+| POST    | `/pokemons`      | Pokémon erstellen                 |
+| PUT     | `/pokemons/{id}` | Pokémon bearbeiten (nur Besitzer) |
+| DELETE  | `/pokemons/{id}` | Pokémon löschen (nur Besitzer)    |
 
-### Beispiel: POST `/pokemons`
+## 🔑 Authentifizierung (JWT)
 
-```json
-{
-  "name": "Pikachu",
-  "hp": 35,
-  "cp": 55
-}
-```
-```
-Antwort:
+Geschützte Endpunkte benötigen folgenden Header:
 
-201 Created
+Authorization: Bearer <JWT_TOKEN>
 
-Pokémon mit generierter ID
-```
-
----
+Der Token wird beim Login oder bei der Registrierung generiert.
 
 ## 🧪 Tests
 
-- REST-Tests mit Postman
+- Manuelle API-Tests mit Postman
 
 - Datenbankprüfung mit DBeaver
 
-- DELETE-Anfragen ohne Request Body
+- Ownership-Tests (403 Forbidden)
 
----
+- Sicherheitstests (401 Unauthorized)
 
-## 🔐 Sicherheit (Hinweis)
+## 🔒 Sicherheitsaspekte
 
-⚠️ Aktuell gibt es noch keine Authentifizierung.
-Passwörter werden noch nicht gespeichert.
+- Passwörter werden niemals im Klartext gespeichert
 
-Geplante Umsetzung:
+- JWT-Signatur (HS256)
 
-- Benutzer-Entity
+- Stateless Backend (keine Sessions)
 
-- Passwort-Hashing (BCrypt)
+- Zugriffskontrolle auf Service-Ebene
 
-- JWT-basierte Authentifizierung
+- Sichere Löschung abhängiger Daten
 
----
+## 👤 Autor
 
-## Autor
-- Entwickelt von [Raoul Tchangou]
+- Raoul Tchangou
+
 - Projekt für Lernzwecke und Portfolio
-- Projektstatus: In Entwicklung
+
+- Status: funktionsfähig und erweiterbar
